@@ -44,6 +44,9 @@ jobs:
           # Copy new docker-compose.yml
           scp docker-compose.yml $PROD_SERVER_USER@$PROD_SERVER_HOST:$DEPLOY_PATH/docker-compose.yml
 
+          # Copy public folder for static file server
+          scp -r public $PROD_SERVER_USER@$PROD_SERVER_HOST:$DEPLOY_PATH/
+
           # SSH and deploy
           ssh $PROD_SERVER_USER@$PROD_SERVER_HOST "
             set -euo pipefail
