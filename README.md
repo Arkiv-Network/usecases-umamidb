@@ -45,7 +45,7 @@ Privacy-first web analytics with blockchain backup powered by Arkiv DB storage.
    ```
 
 4. **Access dashboard**
-   - Open: <https://umami.golemdb.io>
+   - Open: <https://umami.usecases.arkiv.network>
    - Login: `admin`
    - Password: `[check UMAMI_ADMIN_PASSWORD in .env]`
 
@@ -61,7 +61,7 @@ DATABASE_URL=postgresql://umami_user:YOUR_DB_PASSWORD@db:5432/umami
 APP_SECRET=YOUR_APP_SECRET
 
 # Umami API Access
-UMAMI_URL=https://umami.golemdb.io
+UMAMI_URL=https://umami.usecases.arkiv.network
 UMAMI_USERNAME=admin
 UMAMI_PASSWORD=YOUR_PASSWORD
 
@@ -85,7 +85,7 @@ Use the automated setup script:
 node setup-all-projects.js
 ```
 
-Or manually through the dashboard at <https://umami.golemdb.io/dashboard>
+Or manually through the dashboard at <https://umami.usecases.arkiv.network/dashboard>
 
 ## 📈 Adding Tracking to Your Website
 
@@ -94,7 +94,7 @@ Add this script to your website's `<head>` section:
 ```html
 <script
   async
-  src="https://umami.golemdb.io/script.js"
+  src="https://umami.usecases.arkiv.network/script.js"
   data-website-id="YOUR_WEBSITE_ID"
 ></script>
 ```
@@ -107,7 +107,7 @@ Add to your service in `docker-compose.yml`:
 networks:
   default:
     external: true
-    name: moon_golem_network
+    name: traefik-network
 ```
 
 Then add Traefik labels for script proxying:
@@ -122,7 +122,7 @@ labels:
 
 ### Real-time Sync
 
-Data is automatically synced to Golem DB blockchain **in real-time** using a sophisticated queue system:
+Data is automatically synced to Arkiv DB blockchain **in real-time** using a sophisticated queue system:
 
 - **🚀 Instant Sync**: Data synced immediately after being recorded in Umami
 - **📦 Batch Processing**: Queue batches up to 10 items or 5-second timeout
@@ -157,29 +157,29 @@ docker compose up -d
 
 ```bash
 # One-time sync for historical data
-docker compose --profile sync up golem-sync
+docker compose --profile sync up arkiv-sync
 ```
 
 ### Monitoring Real-time Sync
 
 ```bash
 # View real-time sync logs
-docker compose logs golem-realtime-sync -f
+docker compose logs arkiv-realtime-sync -f
 
 # Check sync service status
-docker compose ps golem-realtime-sync
+docker compose ps arkiv-realtime-sync
 ```
 
 ## 🔍 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login` | Authenticate user |
-| GET | `/api/websites` | List websites |
-| POST | `/api/websites` | Create website |
-| GET | `/api/websites/:id/stats` | Get analytics |
-| POST | `/api/send` | Receive tracking data |
-| GET | `/script.js` | Tracking script |
+| Method | Endpoint                  | Description           |
+| ------ | ------------------------- | --------------------- |
+| POST   | `/api/auth/login`         | Authenticate user     |
+| GET    | `/api/websites`           | List websites         |
+| POST   | `/api/websites`           | Create website        |
+| GET    | `/api/websites/:id/stats` | Get analytics         |
+| POST   | `/api/send`               | Receive tracking data |
+| GET    | `/script.js`              | Tracking script       |
 
 ## 📊 Configured Websites
 
@@ -250,8 +250,8 @@ MIT License - see LICENSE file for details
 
 ## 🔗 Links
 
-- **Live Demo**: <https://umami.golemdb.io>
-- **Dashboard**: <https://umami.golemdb.io/dashboard>
+- **Live Demo**: <https://umami.usecases.arkiv.network>
+- **Dashboard**: <https://umami.usecases.arkiv.network/dashboard>
 - **Umami Official**: <https://umami.is>
 - **Arkiv Network**: <https://arkiv.network>
 

@@ -1,76 +1,57 @@
-name: Deploy Umami Analytics
+name: Build and Deploy
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - 'README.md'
-      - 'docs/**'
-      - '*.md'
-  pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
-
-env:
-  DEPLOYMENT_HOST: moon.dev.golem.network
-  DEPLOYMENT_PATH: /home/ubuntu/projects/umamidb
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: production
+    permissions:
+      contents: read
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add server to known hosts
+      - name: Setup SSH key
         run: |
-          ssh-keyscan -H ${{ env.DEPLOYMENT_HOST }} >> ~/.ssh/known_hosts
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.PROD_SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Pre-deployment health check
+      - name: Deploy to production server
+        env:
+          PROD_SERVER_HOST: ${{ secrets.PROD_SERVER_HOST }}
+          PROD_SERVER_USER: ${{ secrets.PROD_SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh ubuntu@${{ env.DEPLOYMENT_HOST }} '
-            cd ${{ env.DEPLOYMENT_PATH }}
-            docker compose ps
-            docker compose logs --tail=10 umami golem-realtime-sync
-          '
+          set -euo pipefail
 
-      - name: Deploy with zero-downtime strategy
-        run: |
-          ssh ubuntu@${{ env.DEPLOYMENT_HOST }} '
-            cd ${{ env.DEPLOYMENT_PATH }}
+          # Copy docker-compose.yml to server (backup existing one first)
+          ssh $PROD_SERVER_USER@$PROD_SERVER_HOST "
+            set -euo pipefail
+            cd $DEPLOY_PATH
+            if [ -f docker-compose.yml ]; then
+              cp docker-compose.yml docker-compose.backup.yml
+            fi
+          "
 
-            # Create backup of current state
-            docker compose config > docker-compose.backup.yml
+          # Copy new docker-compose.yml
+          scp docker-compose.yml $PROD_SERVER_USER@$PROD_SERVER_HOST:$DEPLOY_PATH/docker-compose.yml
 
-            # Pull new images
+          # SSH and deploy
+          ssh $PROD_SERVER_USER@$PROD_SERVER_HOST "
+            set -euo pipefail
+            cd $DEPLOY_PATH
             docker compose pull
-
-            # Graceful restart
             docker compose up -d
-            sleep 30
+          "
 
-            # Cleanup old images
-            docker image prune -f || true
-          '
-
-      - name: Post-deployment verification
-        run: |
-          ssh ubuntu@${{ env.DEPLOYMENT_HOST }} '
-            cd ${{ env.DEPLOYMENT_PATH }}
-
-            # Wait for services to be fully ready
-            sleep 15
-
-            # Verify all services are healthy
-            docker compose ps
-
-            echo "Deployment successful!"
-          '
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -rf ~/.ssh/id_rsa

@@ -1,22 +1,22 @@
 {
-  "name": "umami-golem-sync",
-  "version": "1.0.0",
-  "description": "Sync Umami analytics data to Arkiv DB",
-  "main": "golem-sync.js",
-  "scripts": {
-    "sync": "node golem-sync.js sync",
-    "query": "node golem-sync.js query",
-    "sync-hourly": "node golem-sync.js sync",
-    "realtime-sync": "node real-time-sync.js",
-    "install-deps": "bun install"
-  },
-  "dependencies": {
-    "@arkiv-network/sdk": "^0.4.0",
-    "dotenv": "^16.0.0",
-    "pg": "^8.11.0",
-    "tslib": "^2.8.1"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+	"name": "umami-arkiv-sync",
+	"version": "1.0.0",
+	"description": "Sync Umami analytics data to Arkiv DB",
+	"main": "golem-sync.js",
+	"scripts": {
+		"sync": "node golem-sync.js sync",
+		"query": "node golem-sync.js query",
+		"sync-hourly": "node golem-sync.js sync",
+		"realtime-sync": "node real-time-sync.js",
+		"install-deps": "bun install"
+	},
+	"dependencies": {
+		"@arkiv-network/sdk": "^0.4.0",
+		"dotenv": "^16.0.0",
+		"pg": "^8.11.0",
+		"tslib": "^2.8.1"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	}
 }
